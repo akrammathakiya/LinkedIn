@@ -51,7 +51,7 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = async (req,res) => {
+export const login = async (req, res) => {
   try {
     let { email, password } = req.body;
 
@@ -65,7 +65,7 @@ export const login = async (req,res) => {
       return res.status(400).json({ message: "incorrect password !" });
     }
 
-    let token = genToken(user._id);
+    let token = await genToken(user._id);
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -73,7 +73,7 @@ export const login = async (req,res) => {
       secure: process.env.NODE_ENVIRONMENT === "production",
     });
 
-    return res.status(200).json({user});
+    return res.status(200).json({ user });
   } catch (error) {
     return res
       .status(500)
@@ -81,16 +81,26 @@ export const login = async (req,res) => {
   }
 };
 
-export const logOut = async (req,res) =>{
-    try {
-        res.clearCookie("token")
-        return res
-        .status(200)
-        .json({message:"LogOut successfully"})
-    } catch (error) {
-        return res
-        .status(500)
-        .json({ message: "internal server error while logout the user" });
-    }  
-}
+export const logOut = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    return res.status(200).json({ message: "LogOut successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "internal server error while logout the user" });
+  }
+};
 
+export const getCurrentUser = async (req, res) => {
+  try {
+    let id  = req.userId
+     const user = await User.findById(id).select("-password")
+     if (!user) {
+      return res.status(400).json({message:"user does't found"})
+     }
+     return res.status(200).json(user)
+  } catch (error) {
+    return res.status(400).json({ message: "internal server error while fetching the user" });
+  }
+};

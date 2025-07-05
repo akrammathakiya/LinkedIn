@@ -3,10 +3,12 @@ import logo from "../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
+import { userDataContext } from "../context/Usercontext";
 
 const Login = () => {
   const [show, setShow] = useState(false);
   const { serverUrl } = useContext(authDataContext);
+  let {userdata,setUserData} = useContext(userDataContext)
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -25,10 +27,12 @@ const Login = () => {
       );
 
       setLoading(false);
+      navigate("/");
+      setUserData(result.data)
       setEmail("");
       setPassword("");
       setErr("");
-      navigate("/");
+      
     } catch (error) {
       setLoading(false);
       setErr(error.response.data.message || "Login failed");
