@@ -14,9 +14,12 @@ const Signup = () => {
   let [userName, setUserName] = useState("");
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
+  let [err,setErr] = useState("")
+  let [loading,setLoading] = useState(false)
 
   const handleSignup = async (e) => {
     e.preventDefault()
+    setLoading(true)
     try {
       let result = await axios.post(serverUrl + "/api/user/signup", {
         firstName,
@@ -25,9 +28,16 @@ const Signup = () => {
         email,
         password
       },{withCredentials:true});
-      console.log(result);
+      setLoading(false)
+      setFirstName("")
+      setLastName("")
+      setUserName("")
+      setEmail("")
+      setPassword("")
+      setErr("")
     } catch (error) {
-      console.log(error);  
+      setLoading(false)
+      setErr(error.response.data.message) 
     }
   };
 
@@ -94,9 +104,13 @@ const Signup = () => {
             {show ? "Hidden" : "Show"}
           </span>
         </div>
-
-        <button className="bg-[#0A66C2] text-white py-[10px] text-[18px] rounded-full focus:outline-none mt-5">
-          Sign Up
+        {err && <p className="text-center text-red-500 ">
+            {err}
+          </p>}
+        <button className="bg-[#0A66C2] text-white py-[10px] text-[18px] rounded-full focus:outline-none mt-5"
+          disabled={loading}
+        >
+          {loading ? "Loading..." : "Sign Up"}
         </button>
         <p
           onClick={() => navigate("/login")}
